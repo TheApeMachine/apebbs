@@ -5,6 +5,7 @@ import(
   "bufio"
   "net"
   "io/ioutil"
+  "strings"
 )
 
 func check(err error, message string) {
@@ -35,18 +36,23 @@ func main() {
 
       for {
         conn.Write([]byte(">"))
-        name, err := buf.ReadString('\n')
+        cmd, err := buf.ReadString('\n')
+        cmd       = strings.Replace(cmd, "\r\n", "", -1)
 
         if err != nil {
           fmt.Printf("Client disconnected.\n")
           break
         }
 
-        conn.Write([]byte("Hello, " + name))
+        if strings.Compare("logout", cmd) == 0 {
+          conn.Write([]byte("Bye!"))
+          fmt.Printf("Client logged out.\n")
+          break
+        } else {
+          fmt.Printf(cmd)
+          conn.Write([]byte(cmd))
+        }
       }
     }()
   }
-
-  // fmt.Printf("GoGo(gadget)CloudTube!\n")
-  // fmt.Printf("Written by Daniel Owen van Dommelen\n")
 }
